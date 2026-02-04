@@ -1,12 +1,35 @@
-// import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import api from './api/api'
+
 
 import './App.css'
 
+
 function App() {
-  // const [count, setCount] = useState(0)
+const [students, setStudent] = useState([]);
+
+const getStudentInfo=async()=>{
+  try{
+
+    await api.get().then((res)=>setStudent(res.data))
+  }catch(error){
+    console.log(error)
+  }
+
+}
+useEffect(()=>{
+  getStudentInfo()
+},[]);
+
 
   return (
-    <p>ok</p>
+
+    <div>
+      {students.map((student)=>(
+        <p key={student.id}>{student.name}</p>
+      ))}
+    </div>
+ 
   )
 }
 
