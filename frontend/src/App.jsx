@@ -9,6 +9,7 @@ import './App.css'
 
 function App() {
 const [students, setStudent] = useState([]);
+const[edit,setEdit]=useState(null)
 
 const getStudentInfo=async()=>{
   try{
@@ -26,9 +27,26 @@ useEffect(()=>{
 const {register,handleSubmit,formState:{errors},reset}=useForm();
 
 const formSubmit=async(data)=>{
-  await api.post('',data)
-  reset()
-  getStudentInfo()
+  try{
+    if(edit){
+      await api.patch(`/${edit.id}/`,data)
+      setEdit(null)
+    }
+    else{
+        await api.post('',data)
+
+    }
+      reset({
+    name:'',
+    department:''
+  });
+  getStudentInfo();
+  }
+  catch(error){
+    console.log(error)
+  }
+
+
 
   
 
@@ -41,6 +59,16 @@ const hanldeDelete=async(id)=>{
 
 }
 
+const handleEdit=(student)=>{
+  setEdit(student)
+  reset({
+    name:student.name, 
+    department:student.department
+  })
+
+
+}
+
   return (
 
 
@@ -49,7 +77,7 @@ const hanldeDelete=async(id)=>{
       <form onSubmit={handleSubmit(formSubmit)}>
         <input placeholder='Name' {...register('name')}/>
         <input placeholder='Department' {...register('department')}/>
-        <button type='submit'> Add</button>
+        <button type='submit'> {edit?'Update':'Add'}</button>
       </form>
 
 
@@ -64,7 +92,7 @@ const hanldeDelete=async(id)=>{
              
           </p>
           <p key={student.id}>{student.department}</p>
-             <button>EDIT</button>
+             <button onClick={()=>handleEdit(student)}>EDIT</button>
              <button onClick={()=>hanldeDelete(student.id)}>Delete</button>
 
         </div>
